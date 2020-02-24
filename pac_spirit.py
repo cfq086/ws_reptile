@@ -63,33 +63,24 @@ def get_josn(html):
         print("出错:", jsons["ret"], jsons["errmsg"])
         return 0, jsons
 
-
-def get_pags(json):
-    vas = json["general_msg_list"]["list"]
-    for itm in vas:
-
-        content_url = itm["app_msg_ext_info"]["content_url"]
-        cover = itm["app_msg_ext_info"]["cover"]
-        timeArray = time.localtime(datatime)
-        otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-        filename = validateTitle(title)
-        #
-        # print("\n***************\n")
-        # print(filename, " 文章保存")
-        # # print("文章id：", id)
-        # # print("时间戳：%s,时间：%s" % (datatime, otherStyleTime))
-        # # print("文章标题：", title)
-        # # print("链接：", content_url)
-        # # print("缩略图：", cover)
-        # 保存页面
-        # save_page(content_url, filename)
-    print("当前页保存完成")
-
-
 def validateTitle(title):
     rstr = r"[\/\\\:\*\?\"\<\>\|]"  # '/ \ : * ? " < > |'
     new_title = re.sub(rstr, "_", title)
     return new_title
+
+def get_pags(json):
+    vas = json["general_msg_list"]["list"]
+    for itm in vas:
+        title = itm["app_msg_ext_info"]["title"]
+        content_url = itm["app_msg_ext_info"]["content_url"]
+        filename = validateTitle(title)
+
+        # 保存页面
+        save_page(content_url, filename)
+    print("当前页保存完成")
+
+
+
 
 
 def save_page(url, filename):
@@ -105,9 +96,11 @@ def save_page(url, filename):
         f.write(md)
 
 
-def save_mysql(jsons,a):
+def save_mysql(jsons,conn):
     vas = jsons["general_msg_list"]["list"]
     for itm in vas:
+        # timeArray = time.localtime(datatime)
+        # otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
         id = itm["comm_msg_info"]["id"]
         type = itm["comm_msg_info"]["type"]
         datatime = itm["comm_msg_info"]["datetime"]
@@ -119,6 +112,6 @@ def save_mysql(jsons,a):
         cover = itm["app_msg_ext_info"]["cover"]
         copyright_stat = itm["app_msg_ext_info"]["copyright_stat"]
 
-        a.install_msg(sid=id, stype=type, sdatatime=datatime, sfakeid=fakeid, sstatus=status)
-        a.install_ext(sid=id, stitle=title, sauthor=author, scontent_url=content_url,scover=cover,scopyright_stat=copyright_stat)
+        conn.install_msg(sid=id, stype=type, sdatatime=datatime, sfakeid=fakeid, sstatus=status)
+        conn.install_ext(sid=id, stitle=title, sauthor=author, scontent_url=content_url,scover=cover,scopyright_stat=copyright_stat)
 

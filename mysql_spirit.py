@@ -69,7 +69,7 @@ if __name__ == "__main__":
     e = a.seletc("select * from msg_info")
     # for i in e:
     #     print(i)
-    id = "6"
+    id = "13"
     type = "123"
     datatime = "123"
     fakeid = "123"
