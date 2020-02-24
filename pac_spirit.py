@@ -89,7 +89,7 @@ def save_page(url, filename):
     with open(filename + ".html", "w", encoding="utf-8") as f:
         f.write(html)
 
-    print("保存成md：")
+    print("保存成md1：")
 
     md = tomd.Tomd(html).markdown
     with open(filename + ".md", "w", encoding="utf-8") as f:
