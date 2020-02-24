@@ -5,7 +5,6 @@ import gzip
 import time
 import re
 import tomd
-
 import os
 
 
