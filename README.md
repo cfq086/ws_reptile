@@ -1,5 +1,5 @@
 # ws_reptile
-![[Python](https://pypi.python.org/pypi/tomd/)](https://img.shields.io/pypi/pyversions/tomd.svg)
+[！[]（https://jitpack.io/v/cfq086/ws_reptile.svg）]（https://jitpack.io/#cfq086/ws_reptile）![[Python](https://pypi.python.org/pypi/tomd/)](https://img.shields.io/pypi/pyversions/tomd.svg)
 <br/><br/>
 这是一个微信公众号文章的爬虫，可以批量爬取某个公众号所有的历史文章。
 
