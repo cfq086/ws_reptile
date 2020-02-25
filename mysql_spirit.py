@@ -25,30 +25,35 @@ class MYsqld():
             print("MYsqld:没有修改任何数据")
 
     def install_msg(self, sid, stype, sdatatime, sfakeid, sstatus):
-
+        effect_row=False
         sql = "INSERT INTO `msg_info` (`id`, `type`, `datetime`, `fakeid`, `status`) VALUES ('" + sid + "', '" + stype + "', '" + sdatatime + "', '" + sfakeid + "', '" + sstatus + "')"
         try:
-            effect_row = self.cur.execute(sql)
-            self.conn.commit()
-            if effect_row:
-                print("MYsqld:【%d】条数据已插入" % effect_row)
-            else:
-                print("MYsqld:没有插入任何数据")
-        except:
-            print("执行失败")
+            effect_row = self.cur.execute(sql)  # 如果插入失败则不返回内容，变量未被定义
+            self.conn.commit()                  # 下面的语句块也不会被执行，
+        except pymysql.err.IntegrityError as result:
+            if result.args[0]==1062:
+                print("msg表中id：【%s】的文章已存在" % str(result.args[1]).split("'")[1])
+        except Exception as result:
+            print(type(result))
+            print(result.args[1])
+            print("未知错误：%s"%result)
+        finally:
+            return effect_row
+
 
     def install_ext(self, sid, stitle, sauthor, scontent_url, scover, scopyright_stat):
-
+        effect_row=False
         sql = "INSERT INTO `ext_info` (`id`, `title`, `author`, `content_url`, `cover`, `copyright_stat`) VALUES ('" + sid + "', '" + stitle + "', '" + sauthor + "', '" + scontent_url + "', '" + scover + "','" + scopyright_stat + "')"
         try:
-            effect_row = self.cur.execute(sql)
-            self.conn.commit()
-            if effect_row:
-                print("MYsqld:【%d】条数据已插入" % effect_row)
-            else:
-                print("MYsqld:没有插入任何数据")
-        except:
-            print("执行失败")
+            effect_row = self.cur.execute(sql)  # 如果插入失败则不返回内容，变量未被定义
+            self.conn.commit()  # 下面的语句块也不会被执行，
+        except pymysql.err.IntegrityError as result:
+            if result.args[0] == 1062:
+                print("ext表中id：【%s】的文章已存在" % str(result.args[1]).split("'")[1])
+        except Exception as result:
+            print("未知错误：%s"%result)
+        return effect_row
+
 
     def delete(self, s):
         effect_row = self.cur.execute(s)
@@ -59,18 +64,18 @@ class MYsqld():
             print("MYsqld:没有删除任何数据")
 
     def __del__(self):
-        print("MYsqld:执行关闭mysql游标；链接")
+        print("\nMYsqld: 关闭Mysql游标，关闭Mysql链接")
         self.cur.close()
         self.conn.close()
 
 
 if __name__ == "__main__":
     a = MYsqld(passwd="sjk520", db="pac")
-    e = a.seletc("select * from msg_info")
+    # e = a.seletc("select * from msg_info")
     # for i in e:
     #     print(i)
-    id = "13"
-    type = "123"
+    id = "101001185"
+    stype = "123"
     datatime = "123"
     fakeid = "123"
     status = "123"
@@ -79,9 +84,9 @@ if __name__ == "__main__":
     content_url = "1212"
     cover = "1212"
     copyright_stat = "1212"
-  #  a.install_msg(sid=id, stype=type, sdatatime=datatime, sfakeid=fakeid, sstatus=status)
-    a.install_ext(sid=id, stitle=title, sauthor=author, scontent_url=content_url,scover=cover,scopyright_stat=copyright_stat)
-
+    b=a.install_msg(sid=id, stype=stype, sdatatime=datatime, sfakeid=fakeid, sstatus=status)
+    # a.install_ext(sid=id, stitle=title, sauthor=author, scontent_url=content_url,scover=cover,scopyright_stat=copyright_stat)
+    print(b)
 # pymysql.Connect()参数说明
 # host(str):      MySQL服务器地址
 # port(int):      MySQL服务器端口号

@@ -35,14 +35,14 @@ def open_url(url):
     return html
 
 
-def pj_url(offset="0"):
+def pj_url(offset="20"):
     url = "https://mp.weixin.qq.com/mp/profile_ext?action=getmsg&__biz=MzI5Mzk4MjYzOA==&f=json&"
     data = {
         "offset": "0",
         "count": "10",
         "is_ok": "1",
         "scene": "124",
-        "key": "6b57f9ad7659ff1fe1fde7da4d50ac54157841d8208ad46259397558a09e76904f2ba878f92a0c83c1b7856d42f51067391aa56e809897bd3930aa4d2720d75fc3b813c832c4282f774e1003524b5d03"}
+        "key": "003066d8f017278c235da0374ae91d6d62f78da15c7b0bfcf3ef7a7a6e6f1fdfc69235fed9e7a510eec6eef913ec1520e76025af277b02b77e20bbcf2f299121f265067e0dacd952cb7f2fe9e1013c2"}
     parm = "&uin=MTQzMDIwMzIzMA%3D%3D&pass_ticket=IznpBAYsYWaJF9Y8rs%2FQJP034V101b1h9F9yWnlO2u1HN9H2bup9e2B9h5RZgXwT"
     data["offset"] = offset
     new_data = urllib.parse.urlencode(data)
@@ -54,19 +54,21 @@ def get_josn(html):
     jsons = json.loads(html)
 
     if not jsons["ret"]:
-        print("加载成功：", jsons["ret"], jsons["errmsg"])
+        print("json数据解析成功：【状态码: %d  %s 】"%(jsons["ret"], jsons["errmsg"]))
         html = html.replace('"general_msg_list":"', '"general_msg_list":')
         html = html.replace('","next_offset"', ',"next_offset"')
         html = html.replace('\\', '')
         return 1, json.loads(html)
     else:
-        print("出错:", jsons["ret"], jsons["errmsg"])
+        print("解析出错:", jsons["ret"], jsons["errmsg"])
         return 0, jsons
+
 
 def validateTitle(title):
     rstr = r"[\/\\\:\*\?\"\<\>\|]"  # '/ \ : * ? " < > |'
     new_title = re.sub(rstr, "_", title)
     return new_title
+
 
 def get_pags(json):
     vas = json["general_msg_list"]["list"]
@@ -78,9 +80,6 @@ def get_pags(json):
         # 保存页面
         save_page(content_url, filename)
     print("当前页保存完成")
-
-
-
 
 
 def save_page(url, filename):
@@ -96,22 +95,22 @@ def save_page(url, filename):
         f.write(md)
 
 
-def save_mysql(jsons,conn):
+def save_mysql(jsons, conn):
     vas = jsons["general_msg_list"]["list"]
     for itm in vas:
         # timeArray = time.localtime(datatime)
         # otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-        id = itm["comm_msg_info"]["id"]
-        type = itm["comm_msg_info"]["type"]
-        datatime = itm["comm_msg_info"]["datetime"]
-        fakeid = itm["comm_msg_info"]["fakeid"]
-        status = itm["comm_msg_info"]["status"]
-        title = itm["app_msg_ext_info"]["title"]
-        author= itm["app_msg_ext_info"]["author"]
-        content_url=itm["app_msg_ext_info"]["content_url"]
-        cover = itm["app_msg_ext_info"]["cover"]
-        copyright_stat = itm["app_msg_ext_info"]["copyright_stat"]
+        id = str(itm["comm_msg_info"]["id"])
+        stype = str(itm["comm_msg_info"]["type"])
+        datatime = str(itm["comm_msg_info"]["datetime"])
+        fakeid = str(itm["comm_msg_info"]["fakeid"])
+        status = str(itm["comm_msg_info"]["status"])
+        title = str(itm["app_msg_ext_info"]["title"])
+        author = str(itm["app_msg_ext_info"]["author"])
+        content_url = str(itm["app_msg_ext_info"]["content_url"])
+        cover = str(itm["app_msg_ext_info"]["cover"])
+        copyright_stat = str(itm["app_msg_ext_info"]["copyright_stat"])
 
-        conn.install_msg(sid=id, stype=type, sdatatime=datatime, sfakeid=fakeid, sstatus=status)
-        conn.install_ext(sid=id, stitle=title, sauthor=author, scontent_url=content_url,scover=cover,scopyright_stat=copyright_stat)
-
+        if conn.install_msg(sid=id, stype=stype, sdatatime=datatime, sfakeid=fakeid, sstatus=status):
+            conn.install_ext(sid=id, stitle=title, sauthor=author, scontent_url=content_url, scover=cover,
+                         scopyright_stat=copyright_stat)
