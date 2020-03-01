@@ -55,10 +55,8 @@ def get_josn(html):
 
     if not jsons["ret"]:
         print("json数据解析成功：【状态码: %d  %s 】"%(jsons["ret"], jsons["errmsg"]))
-        html = html.replace('"general_msg_list":"', '"general_msg_list":')
-        html = html.replace('","next_offset"', ',"next_offset"')
-        html = html.replace('\\', '')
-        return 1, json.loads(html)
+        res = json.loads(jsons["general_msg_list"])
+        return 1, res
     else:
         print("解析出错:", jsons["ret"], jsons["errmsg"])
         return 0, jsons
